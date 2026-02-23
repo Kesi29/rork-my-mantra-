@@ -1,4 +1,4 @@
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert as RNAlert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
 if (Platform.OS !== 'web') {
@@ -32,7 +32,7 @@ export async function requestPermissionsWithWarning(): Promise<boolean> {
   }
   const granted = await requestPermissions();
   if (!granted) {
-    Alert.alert(
+    RNAlert.alert(
       'Notifications Are Essential',
       'My Māntra uses notifications to deliver your mantras throughout the day. Without them, you won\'t receive your daily affirmations.\n\nPlease enable notifications in your device settings to get the full experience.',
       [
