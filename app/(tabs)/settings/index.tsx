@@ -17,7 +17,7 @@ import { ChevronRight, Lock, Check, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useMantra } from '@/contexts/MantraContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { requestPermissions } from '@/utils/notifications';
+import { requestPermissionsWithWarning } from '@/utils/notifications';
 import Colors from '@/constants/colors';
 
 const FREQUENCY_OPTIONS = [1, 2, 3, 4, 5, 6, 8, 10, 12];
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
   const handleCustomFreqOpen = useCallback(() => {
     if (!isPro) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      router.push('/paywall');
+      router.push('/paywall' as any);
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -74,12 +74,8 @@ export default function SettingsScreen() {
     async (value: boolean) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       if (value && Platform.OS !== 'web') {
-        const granted = await requestPermissions();
+        const granted = await requestPermissionsWithWarning();
         if (!granted) {
-          Alert.alert(
-            'Permission Required',
-            'Please enable notifications in your device settings to receive mantra reminders.',
-          );
           return;
         }
       }
@@ -114,7 +110,7 @@ export default function SettingsScreen() {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/paywall');
+              router.push('/paywall' as any);
             }}
             testID="go-pro-btn"
           >
@@ -183,7 +179,7 @@ export default function SettingsScreen() {
                   onPress={() => {
                     if (needsPro) {
                       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                      router.push('/paywall');
+                      router.push('/paywall' as any);
                       return;
                     }
                     Haptics.selectionAsync();
