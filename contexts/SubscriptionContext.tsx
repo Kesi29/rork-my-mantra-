@@ -8,6 +8,14 @@ type PurchasesOffering = any;
 
 let rcConfigured = false;
 
+if (Platform.OS !== 'web') {
+  try {
+    Purchases = require('react-native-purchases').default;
+  } catch (e) {
+    console.log('[RC] Could not load react-native-purchases:', e);
+  }
+}
+
 function getRCApiKey(): string | undefined {
   if (__DEV__ || Platform.OS === 'web') {
     return process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY;
@@ -19,11 +27,9 @@ function getRCApiKey(): string | undefined {
   });
 }
 
-async function initRC() {
-  if (rcConfigured) return;
+function initRC() {
+  if (rcConfigured || !Purchases) return;
   try {
-    const mod = await import('react-native-purchases');
-    Purchases = mod.default;
     const apiKey = getRCApiKey();
     if (!apiKey) {
       console.log('[RC] No API key found, skipping configuration');
@@ -44,11 +50,10 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
   const [rcReady, setRcReady] = useState<boolean>(false);
 
   useEffect(() => {
-    initRC().then(() => {
-      if (rcConfigured) {
-        setRcReady(true);
-      }
-    });
+    initRC();
+    if (rcConfigured) {
+      setRcReady(true);
+    }
   }, []);
 
   const customerInfoQuery = useQuery({
