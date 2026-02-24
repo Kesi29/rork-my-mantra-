@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { scheduleMantraNotifications } from '@/utils/notifications';
 import createContextHook from '@nkzw/create-context-hook';
+import { scheduleMantraNotifications } from '@/utils/notifications';
 
 export interface MantraSettings {
   mantra: string;

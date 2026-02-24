@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MantraProvider } from '@/contexts/MantraContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
@@ -19,6 +19,16 @@ function RootLayoutNav() {
   );
 }
 
+function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <SubscriptionProvider>
+      <MantraProvider>
+        {children}
+      </MantraProvider>
+    </SubscriptionProvider>
+  );
+}
+
 export default function RootLayout() {
   useEffect(() => {
     SplashScreen.hideAsync();
@@ -27,11 +37,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <SubscriptionProvider>
-          <MantraProvider>
-            <RootLayoutNav />
-          </MantraProvider>
-        </SubscriptionProvider>
+        <Providers>
+          <RootLayoutNav />
+        </Providers>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

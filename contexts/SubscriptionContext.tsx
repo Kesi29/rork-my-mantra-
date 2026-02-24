@@ -1,23 +1,12 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Platform } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import createContextHook from '@nkzw/create-context-hook';
 
+let Purchases: any = null;
 type PurchasesOffering = any;
 
 let rcConfigured = false;
-let PurchasesModule: any = null;
-
-function getPurchases(): any {
-  if (Platform.OS === 'web') return null;
-  if (PurchasesModule) return PurchasesModule;
-  try {
-    PurchasesModule = require('react-native-purchases').default;
-  } catch (e) {
-    console.log('[RC] Could not load react-native-purchases:', e);
-  }
-  return PurchasesModule;
-}
 
 function getRCApiKey(): string | undefined {
   if (__DEV__ || Platform.OS === 'web') {
@@ -30,10 +19,11 @@ function getRCApiKey(): string | undefined {
   });
 }
 
-function initRC() {
-  const Purchases = getPurchases();
-  if (rcConfigured || !Purchases) return;
+async function initRC() {
+  if (rcConfigured) return;
   try {
+    const mod = await import('react-native-purchases');
+    Purchases = mod.default;
     const apiKey = getRCApiKey();
     if (!apiKey) {
       console.log('[RC] No API key found, skipping configuration');
@@ -54,16 +44,16 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
   const [rcReady, setRcReady] = useState<boolean>(false);
 
   useEffect(() => {
-    initRC();
-    if (rcConfigured) {
-      setRcReady(true);
-    }
+    initRC().then(() => {
+      if (rcConfigured) {
+        setRcReady(true);
+      }
+    });
   }, []);
 
   const customerInfoQuery = useQuery({
     queryKey: ['rc_customer_info', rcReady],
     queryFn: async () => {
-      const Purchases = getPurchases();
       if (!rcConfigured || !Purchases) return null;
       try {
         const info = await Purchases.getCustomerInfo();
@@ -80,7 +70,6 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
   const offeringsQuery = useQuery({
     queryKey: ['rc_offerings', rcReady],
     queryFn: async (): Promise<PurchasesOffering | null> => {
-      const Purchases = getPurchases();
       if (!rcConfigured || !Purchases) return null;
       try {
         const offerings = await Purchases.getOfferings();
@@ -96,7 +85,6 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
 
   const purchaseMutation = useMutation({
     mutationFn: async (packageId: string) => {
-      const Purchases = getPurchases();
       if (!Purchases) throw new Error('Purchases not available');
       const offering = offeringsQuery.data;
       if (!offering) throw new Error('No offerings available');
@@ -113,7 +101,6 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
 
   const restoreMutation = useMutation({
     mutationFn: async () => {
-      const Purchases = getPurchases();
       if (!Purchases) throw new Error('Purchases not available');
       console.log('[RC] Restoring purchases...');
       const info = await Purchases.restorePurchases();
