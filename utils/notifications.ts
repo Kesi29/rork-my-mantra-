@@ -26,24 +26,6 @@ export async function requestPermissions(): Promise<boolean> {
   return finalStatus === 'granted';
 }
 
-export async function requestPermissionsWithWarning(): Promise<boolean> {
-  if (Platform.OS === 'web') {
-    return false;
-  }
-  const granted = await requestPermissions();
-  if (!granted) {
-    const { Alert } = require('react-native');
-    Alert.alert(
-      'Notifications Are Essential',
-      'My Māntra uses notifications to deliver your mantras throughout the day. Without them, you won\'t receive your daily affirmations.\n\nPlease enable notifications in your device settings to get the full experience.',
-      [
-        { text: 'I Understand', style: 'cancel' },
-      ],
-    );
-  }
-  return granted;
-}
-
 export async function scheduleMantraNotifications(
   mantras: string[],
   timesPerDay: number,

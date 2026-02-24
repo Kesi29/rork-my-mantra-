@@ -87,7 +87,7 @@ export default function MantrasScreen() {
           'Upgrade to Pro to unlock all premium mantras.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Upgrade', onPress: () => router.push('/paywall' as any) },
+            { text: 'Upgrade', onPress: () => router.push('/paywall') },
           ],
         );
         return;
@@ -117,7 +117,7 @@ export default function MantrasScreen() {
         'Additional mantras are available for Pro subscribers.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade', onPress: () => router.push('/paywall' as any) },
+          { text: 'Upgrade', onPress: () => router.push('/paywall') },
         ],
       );
       return;
@@ -199,7 +199,7 @@ export default function MantrasScreen() {
           'Schedule mantras for upcoming days with Pro.',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Upgrade', onPress: () => router.push('/paywall' as any) },
+            { text: 'Upgrade', onPress: () => router.push('/paywall') },
           ],
         );
         return;
@@ -245,7 +245,7 @@ export default function MantrasScreen() {
   const handleCustomFreqOpen = useCallback(() => {
     if (!isPro) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      router.push('/paywall' as any);
+      router.push('/paywall');
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -525,7 +525,7 @@ export default function MantrasScreen() {
                       onPress={() => {
                         if (needsPro) {
                           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                          router.push('/paywall' as any);
+                          router.push('/paywall');
                           return;
                         }
                         Haptics.selectionAsync();
@@ -700,7 +700,7 @@ export default function MantrasScreen() {
                 ]}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  router.push('/paywall' as any);
+                  router.push('/paywall');
                 }}
               >
                 <Text style={styles.proBannerText}>UNLOCK ALL MANTRAS</Text>
