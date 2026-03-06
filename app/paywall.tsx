@@ -27,7 +27,7 @@ const FEATURES = [
 export default function PaywallScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { offering, purchase, isPurchasing, restore, isRestoring, isPro } = useSubscription();
+  const { product, purchase, isPurchasing, restore, isRestoring, isPro } = useSubscription();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -44,26 +44,21 @@ export default function PaywallScreen() {
     }
   }, [isPro, router]);
 
-  const monthlyPackage = offering?.availablePackages?.find(
-    (p: any) => p.identifier === '$rc_monthly',
-  );
-
   const handlePurchase = async () => {
-    if (!monthlyPackage) {
+    if (!product) {
       Alert.alert('Unavailable', 'Subscription is not available right now. Please try again later.');
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await purchase(monthlyPackage.identifier);
+      await purchase();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Welcome to Pro', 'You now have access to all premium mantras.', [
         { text: 'Continue', onPress: () => router.back() },
       ]);
     } catch (e: unknown) {
-      const error = e as { userCancelled?: boolean; message?: string };
-      if (error.userCancelled) {
-        console.log('[Paywall] User cancelled');
+      const error = e as { code?: string; message?: string };
+      if (error.code === 'E_USER_CANCELLED') {
         return;
       }
       console.log('[Paywall] Purchase error:', e);
@@ -74,15 +69,20 @@ export default function PaywallScreen() {
   const handleRestore = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      await restore();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      const restored = await restore();
+      if (restored) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert('Restored', 'Your Pro subscription has been restored.');
+      } else {
+        Alert.alert('No Subscription Found', 'We couldn\'t find an active subscription to restore.');
+      }
     } catch (e) {
       console.log('[Paywall] Restore error:', e);
       Alert.alert('Restore Failed', 'Could not restore purchases. Please try again.');
     }
   };
 
-  const priceLabel = monthlyPackage?.product?.priceString ?? '$1.99';
+  const priceLabel = product?.localizedPrice ?? '$1.99';
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -164,7 +164,7 @@ export default function PaywallScreen() {
           </Pressable>
 
           <Text style={styles.legalText}>
-            Payment will be charged to your {Platform.OS === 'ios' ? 'iTunes' : Platform.OS === 'android' ? 'Google Play' : ''} account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period.
+            Payment will be charged to your Apple ID account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings.
           </Text>
         </Animated.View>
       </ScrollView>

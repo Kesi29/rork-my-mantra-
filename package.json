@@ -6,7 +6,9 @@
     "start": "bunx rork start -p zw623vs8jg8gn8z8gbzdb --tunnel",
     "start-web": "bunx rork start -p zw623vs8jg8gn8z8gbzdb --web --tunnel",
     "start-web-dev": "DEBUG=expo* bunx rork start -p zw623vs8jg8gn8z8gbzdb --web --tunnel",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -38,12 +40,14 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
-    "react-native-purchases": "^9.7.6",
+    "react-native-iap": "^14.7.14",
+    "react-native-nitro-modules": "^0.31.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0",
     "react-native-worklets": "0.5.1",
+    "zod": "^4.3.6",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
