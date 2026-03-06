@@ -40,7 +40,10 @@ export default function PaywallScreen() {
 
   useEffect(() => {
     if (isPro) {
-      router.back();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert('Welcome to Pro', 'You now have access to all premium mantras.', [
+        { text: 'Continue', onPress: () => router.back() },
+      ]);
     }
   }, [isPro, router]);
 
@@ -52,10 +55,6 @@ export default function PaywallScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await purchase();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Welcome to Pro', 'You now have access to all premium mantras.', [
-        { text: 'Continue', onPress: () => router.back() },
-      ]);
     } catch (e: unknown) {
       const error = e as { code?: string; message?: string };
       if (error.code === 'E_USER_CANCELLED') {
