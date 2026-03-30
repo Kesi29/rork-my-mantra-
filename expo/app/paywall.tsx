@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   Platform,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +17,9 @@ import { X, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import Colors from '@/constants/colors';
+
+const TERMS_OF_USE_URL = 'https://mantra-app.my.canva.site/';
+const PRIVACY_POLICY_URL = 'https://mantra-app.my.canva.site/';
 
 const FEATURES = [
   '20+ premium mantras across 5 categories',
@@ -165,6 +169,22 @@ export default function PaywallScreen() {
           <Text style={styles.legalText}>
             Payment will be charged to your Apple ID account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings.
           </Text>
+
+          <View style={styles.legalLinksRow}>
+            <Pressable
+              onPress={() => Linking.openURL(TERMS_OF_USE_URL)}
+              hitSlop={8}
+            >
+              <Text style={styles.legalLinkText}>Terms of Use</Text>
+            </Pressable>
+            <Text style={styles.legalLinkText}> · </Text>
+            <Pressable
+              onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+              hitSlop={8}
+            >
+              <Text style={styles.legalLinkText}>Privacy Policy</Text>
+            </Pressable>
+          </View>
         </Animated.View>
       </ScrollView>
     </View>
@@ -300,5 +320,16 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     lineHeight: 17,
     letterSpacing: 0.1,
+  },
+  legalLinksRow: {
+    flexDirection: 'row' as const,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    paddingBottom: 24,
+    marginTop: 16,
+  },
+  legalLinkText: {
+    fontSize: 12,
+    color: '#888888',
   },
 });
