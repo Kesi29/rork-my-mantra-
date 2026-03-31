@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
   TextInput,
+  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -19,6 +20,9 @@ import { useMantra } from '@/contexts/MantraContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { requestPermissions } from '@/utils/notifications';
 import Colors from '@/constants/colors';
+
+const PRIVACY_POLICY_URL = 'https://mantra-app.my.canva.site/';
+const TERMS_OF_USE_URL = 'https://mantra-app.my.canva.site/';
 
 const FREQUENCY_OPTIONS = [1, 2, 3, 4, 5, 6, 8, 10, 12];
 const PRO_FREQUENCY_OPTIONS = [15, 20, 25, 30];
@@ -354,6 +358,36 @@ export default function SettingsScreen() {
             <Text style={styles.savingText}>SAVING...</Text>
           </Animated.View>
         )}
+
+        <View style={[styles.divider, { marginTop: 28 }]} />
+        <Text style={styles.sectionLabel}>LEGAL</Text>
+        <View style={styles.divider} />
+
+        <Pressable
+          style={styles.settingRow}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Linking.openURL(PRIVACY_POLICY_URL);
+          }}
+          testID="privacy-policy-row"
+        >
+          <Text style={styles.settingLabel}>Privacy Policy</Text>
+          <ChevronRight size={16} color={Colors.textMuted} />
+        </Pressable>
+
+        <View style={styles.divider} />
+
+        <Pressable
+          style={styles.settingRow}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Linking.openURL(TERMS_OF_USE_URL);
+          }}
+          testID="terms-of-use-row"
+        >
+          <Text style={styles.settingLabel}>Terms of Use</Text>
+          <ChevronRight size={16} color={Colors.textMuted} />
+        </Pressable>
       </ScrollView>
     </View>
   );
@@ -519,6 +553,14 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 11,
     fontWeight: '500' as const,
+    letterSpacing: 2,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    color: Colors.textMuted,
+    marginTop: 18,
+    marginBottom: 10,
     letterSpacing: 2,
   },
   optionChipLocked: {

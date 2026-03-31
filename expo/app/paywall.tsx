@@ -42,15 +42,6 @@ export default function PaywallScreen() {
     }).start();
   }, [fadeAnim]);
 
-  useEffect(() => {
-    if (isPro) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Welcome to Pro', 'You now have access to all premium mantras.', [
-        { text: 'Continue', onPress: () => router.back() },
-      ]);
-    }
-  }, [isPro, router]);
-
   const handlePurchase = async () => {
     if (!product) {
       Alert.alert('Unavailable', 'Subscription is not available right now. Please try again later.');
@@ -85,7 +76,9 @@ export default function PaywallScreen() {
     }
   };
 
-  const priceLabel = product?.localizedPrice ?? '$1.99';
+  const rawPrice = (product as any)?.localizedPrice ?? (product as any)?.price ?? null;
+  const priceLabel = rawPrice ? String(rawPrice) : 'See App Store';
+  const manageSubscriptionUrl = 'https://apps.apple.com/account/subscriptions';
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -107,68 +100,106 @@ export default function PaywallScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          <Text style={styles.pageLabel}>MY MANTRA PRO</Text>
+          {isPro ? (
+            <>
+              <Text style={styles.pageLabel}>MY SUBSCRIPTION</Text>
 
-          <Text style={styles.heroTitle}>
-            Unlock the{'\n'}full mantra collection.
-          </Text>
+              <Text style={styles.heroTitle}>Mantra Pro</Text>
+              <Text style={styles.heroSubtitle}>Monthly subscription</Text>
 
-          <Text style={styles.heroSubtitle}>
-            Expand your practice with premium affirmations curated for extended reflection.
-          </Text>
-
-          <View style={styles.featuresList}>
-            {FEATURES.map((feature, i) => (
-              <View key={i} style={styles.featureRow}>
-                <Check size={14} color={Colors.text} strokeWidth={2.5} />
-                <Text style={styles.featureText}>{feature}</Text>
+              <View style={styles.subscriptionCard}>
+                <View style={styles.subscriptionRow}>
+                  <Text style={styles.subscriptionLabel}>Plan</Text>
+                  <Text style={styles.subscriptionValue}>Mantra Pro</Text>
+                </View>
+                <View style={styles.subscriptionDivider} />
+                <View style={styles.subscriptionRow}>
+                  <Text style={styles.subscriptionLabel}>Billing</Text>
+                  <Text style={styles.subscriptionValue}>Monthly subscription</Text>
+                </View>
+                <View style={styles.subscriptionDivider} />
+                <View style={styles.subscriptionRow}>
+                  <Text style={styles.subscriptionLabel}>Price</Text>
+                  <Text style={styles.subscriptionValue}>{priceLabel}</Text>
+                </View>
               </View>
-            ))}
-          </View>
 
-          <View style={styles.priceBlock}>
-            <View style={styles.priceRow}>
-              <Text style={styles.priceLabel}>Monthly</Text>
-              <View style={styles.priceRight}>
-                <Text style={styles.priceAmount}>{priceLabel}</Text>
-                <Text style={styles.pricePeriod}>/mo</Text>
+              <Pressable
+                style={({ pressed }) => [styles.manageBtn, pressed && styles.pressed]}
+                onPress={() => Linking.openURL(manageSubscriptionUrl)}
+                testID="manage-subscription-btn"
+              >
+                <Text style={styles.manageBtnText}>MANAGE SUBSCRIPTION</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={styles.pageLabel}>MY MANTRA PRO</Text>
+
+              <Text style={styles.heroTitle}>
+                Unlock the{'\n'}full mantra collection.
+              </Text>
+
+              <Text style={styles.heroSubtitle}>
+                Expand your practice with premium affirmations curated for extended reflection.
+              </Text>
+
+              <View style={styles.featuresList}>
+                {FEATURES.map((feature, i) => (
+                  <View key={i} style={styles.featureRow}>
+                    <Check size={14} color={Colors.text} strokeWidth={2.5} />
+                    <Text style={styles.featureText}>{feature}</Text>
+                  </View>
+                ))}
               </View>
-            </View>
-          </View>
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.purchaseBtn,
-              (isPurchasing || isRestoring) && styles.purchaseBtnDisabled,
-              pressed && styles.pressed,
-            ]}
-            onPress={handlePurchase}
-            disabled={isPurchasing || isRestoring}
-            testID="purchase-btn"
-          >
-            {isPurchasing ? (
-              <ActivityIndicator color={Colors.white} />
-            ) : (
-              <Text style={styles.purchaseBtnText}>SUBSCRIBE FOR {priceLabel}/MO</Text>
-            )}
-          </Pressable>
+              <View style={styles.priceBlock}>
+                <View style={styles.priceRow}>
+                  <Text style={styles.priceLabel}>Monthly</Text>
+                  <View style={styles.priceRight}>
+                    <Text style={styles.priceAmount}>{(product as any)?.localizedPrice ?? '$1.99'}</Text>
+                    <Text style={styles.pricePeriod}>/mo</Text>
+                  </View>
+                </View>
+              </View>
 
-          <Pressable
-            style={styles.restoreBtn}
-            onPress={handleRestore}
-            disabled={isPurchasing || isRestoring}
-            testID="restore-btn"
-          >
-            {isRestoring ? (
-              <ActivityIndicator size="small" color={Colors.textMuted} />
-            ) : (
-              <Text style={styles.restoreBtnText}>RESTORE PURCHASES</Text>
-            )}
-          </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.purchaseBtn,
+                  (isPurchasing || isRestoring) && styles.purchaseBtnDisabled,
+                  pressed && styles.pressed,
+                ]}
+                onPress={handlePurchase}
+                disabled={isPurchasing || isRestoring}
+                testID="purchase-btn"
+              >
+                {isPurchasing ? (
+                  <ActivityIndicator color={Colors.white} />
+                ) : (
+                  <Text style={styles.purchaseBtnText}>
+                    SUBSCRIBE FOR {(product as any)?.localizedPrice ?? '$1.99'}/MO
+                  </Text>
+                )}
+              </Pressable>
 
-          <Text style={styles.legalText}>
-            Payment will be charged to your Apple ID account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings.
-          </Text>
+              <Pressable
+                style={styles.restoreBtn}
+                onPress={handleRestore}
+                disabled={isPurchasing || isRestoring}
+                testID="restore-btn"
+              >
+                {isRestoring ? (
+                  <ActivityIndicator size="small" color={Colors.textMuted} />
+                ) : (
+                  <Text style={styles.restoreBtnText}>RESTORE PURCHASES</Text>
+                )}
+              </Pressable>
+
+              <Text style={styles.legalText}>
+                Payment will be charged to your Apple ID account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in Settings.
+              </Text>
+            </>
+          )}
 
           <View style={styles.legalLinksRow}>
             <Pressable
@@ -331,5 +362,47 @@ const styles = StyleSheet.create({
   legalLinkText: {
     fontSize: 12,
     color: '#888888',
+  },
+  subscriptionCard: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: Colors.border,
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  subscriptionRow: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    paddingVertical: 16,
+  },
+  subscriptionDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  subscriptionLabel: {
+    fontSize: 13,
+    color: Colors.textMuted,
+    letterSpacing: 0.3,
+  },
+  subscriptionValue: {
+    fontSize: 15,
+    color: Colors.text,
+    fontFamily: Platform.select({ ios: 'Georgia', android: 'serif', web: 'Georgia, serif' }),
+  },
+  manageBtn: {
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: 16,
+    width: '100%' as const,
+    marginBottom: 10,
+  },
+  manageBtnText: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    color: Colors.text,
+    letterSpacing: 2,
   },
 });

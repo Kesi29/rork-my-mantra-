@@ -47,6 +47,7 @@ export const [SubscriptionProvider, useSubscription] = createContextHook(() => {
     const purchaseSub = IAP.purchaseUpdatedListener(async (purchase: any) => {
       if (purchase.transactionReceipt || purchase.id) {
         try {
+          // react-native-iap v14+ expects an object signature.
           await IAP!.finishTransaction({ purchase, isConsumable: false });
           setIsPro(true);
           queryClient.invalidateQueries({ queryKey: ['iap_purchases'] });
