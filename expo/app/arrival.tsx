@@ -21,6 +21,18 @@ import {
 
 const { width: SW, height: SH } = Dimensions.get('window');
 
+const SERIF = Platform.select({
+  ios: 'Didot',
+  android: 'serif',
+  web: 'Didot, "Playfair Display", "Cormorant Garamond", Georgia, serif',
+});
+
+const SANS = Platform.select({
+  ios: 'Avenir Next',
+  android: 'sans-serif',
+  web: '"Avenir Next", Avenir, Montserrat, sans-serif',
+});
+
 export default function ArrivalScreen() {
   const insets = useSafeAreaInsets();
   const { mantraText = '', arrivedAt = '' } = useLocalSearchParams<{
@@ -63,7 +75,7 @@ export default function ArrivalScreen() {
     ]).start();
   }, [labelAnim, mantraAnim, buttonAnim]);
 
-  const mkStyle = (anim: Animated.Value, ty: number) => ({
+  const mkAnim = (anim: Animated.Value, ty: number) => ({
     opacity: anim,
     transform: [
       { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [ty, 0] }) },
@@ -78,7 +90,7 @@ export default function ArrivalScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 1 — Gradient mesh background */}
+      {/* 1 — Gradient mesh */}
       <GradientMesh
         cardStyle={cardStyle}
         width={SW}
@@ -86,7 +98,7 @@ export default function ArrivalScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* 2 — Dark vignette overlays for text contrast */}
+      {/* 2 — Vignettes */}
       <LinearGradient
         colors={[`rgba(0,0,0,${cardStyle.overlayStrength + 0.15})`, 'transparent']}
         locations={[0, 0.45]}
@@ -99,7 +111,6 @@ export default function ArrivalScreen() {
         style={styles.vignetteBottom}
         pointerEvents="none"
       />
-      {/* Centre darkening — subtle radial-like effect */}
       <View
         style={[
           styles.centreDarken,
@@ -108,13 +119,9 @@ export default function ArrivalScreen() {
         pointerEvents="none"
       />
 
-      {/* 3 — Back button */}
+      {/* 3 — Back chevron */}
       <Animated.View
-        style={[
-          styles.backRow,
-          { paddingTop: insets.top + 8 },
-          mkStyle(labelAnim, 8),
-        ]}
+        style={[styles.backRow, { paddingTop: insets.top + 8 }, mkAnim(labelAnim, 8)]}
       >
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
@@ -125,13 +132,9 @@ export default function ArrivalScreen() {
         </Pressable>
       </Animated.View>
 
-      {/* 4 — Top label: "ARRIVED AT 2:47 PM" */}
+      {/* 4 — Timestamp */}
       <Animated.View
-        style={[
-          styles.topLabel,
-          { top: insets.top + 52 },
-          mkStyle(labelAnim, 10),
-        ]}
+        style={[styles.topLabel, { top: insets.top + 56 }, mkAnim(labelAnim, 10)]}
       >
         <Text style={[styles.arrivedText, shadow]}>
           {arrivedAt
@@ -140,29 +143,31 @@ export default function ArrivalScreen() {
         </Text>
       </Animated.View>
 
-      {/* 5 — Centre: mantra text, positioned slightly above true-centre (golden ratio) */}
+      {/* 5 — Mantra + share button (golden-ratio offset) */}
       <View style={styles.mantraArea} pointerEvents="box-none">
-        <Animated.View style={[styles.mantraWrap, mkStyle(mantraAnim, 24)]}>
+        <Animated.View style={[styles.mantraWrap, mkAnim(mantraAnim, 24)]}>
           <Text style={[styles.mantraText, shadow]}>{mantraText}</Text>
         </Animated.View>
 
-        {/* Share button directly below mantra */}
         {showShareButton && (
-          <Animated.View style={[styles.shareBtnWrap, mkStyle(buttonAnim, 12)]}>
+          <Animated.View style={[styles.shareBtnWrap, mkAnim(buttonAnim, 12)]}>
             <Pressable
               style={({ pressed }) => [styles.shareBtn, pressed && styles.pressed]}
               onPress={() =>
-                router.push({ pathname: '/share-card', params: { mantraText } })
+                router.push({
+                  pathname: '/share-card',
+                  params: { mantraText, arrivedAt },
+                })
               }
             >
               <Share2 size={15} color="rgba(255,255,255,0.85)" />
-              <Text style={[styles.shareBtnText, shadow]}>Share this moment</Text>
+              <Text style={[styles.shareBtnText]}>Share this moment</Text>
             </Pressable>
           </Animated.View>
         )}
       </View>
 
-      {/* 6 — Bottom watermark */}
+      {/* 6 — Watermark */}
       <View style={[styles.watermark, { paddingBottom: insets.bottom + 16 }]}>
         <Text style={[styles.watermarkText, shadow]}>Mantra — On Time</Text>
       </View>
@@ -171,16 +176,9 @@ export default function ArrivalScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
+  container: { flex: 1, backgroundColor: '#000' },
 
-  /* ── Vignette overlays ────────────────────────── */
-  vignetteTop: {
-    ...StyleSheet.absoluteFillObject,
-    height: SH * 0.45,
-  },
+  vignetteTop: { ...StyleSheet.absoluteFillObject, height: SH * 0.45 },
   vignetteBottom: {
     position: 'absolute',
     left: 0,
@@ -188,17 +186,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: SH * 0.45,
   },
-  centreDarken: {
-    ...StyleSheet.absoluteFillObject,
-  },
+  centreDarken: { ...StyleSheet.absoluteFillObject },
 
-  /* ── Back button ──────────────────────────────── */
-  backRow: {
-    position: 'absolute',
-    top: 0,
-    left: 12,
-    zIndex: 10,
-  },
+  backRow: { position: 'absolute', top: 0, left: 12, zIndex: 10 },
   backBtn: {
     width: 40,
     height: 40,
@@ -208,7 +198,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  /* ── Timestamp label ──────────────────────────── */
   topLabel: {
     position: 'absolute',
     left: 0,
@@ -217,64 +206,50 @@ const styles = StyleSheet.create({
   },
   arrivedText: {
     fontSize: 11,
-    fontWeight: '600' as const,
-    fontFamily: Platform.select({
-      ios: 'Menlo',
-      android: 'monospace',
-      web: 'monospace',
-    }),
-    color: 'rgba(255,255,255,0.7)',
-    letterSpacing: 3.5,
+    fontWeight: '500' as const,
+    fontFamily: SANS,
+    color: 'rgba(255,255,255,0.65)',
+    letterSpacing: 4,
   },
 
-  /* ── Mantra area — golden-ratio offset (44% from top) ── */
   mantraArea: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: SH * 0.06, // nudge text slightly above true centre
+    paddingBottom: SH * 0.06,
   },
-  mantraWrap: {
-    paddingHorizontal: 36,
-    maxWidth: 400,
-  },
+  mantraWrap: { paddingHorizontal: 40, maxWidth: 420 },
   mantraText: {
-    fontSize: 34,
-    fontWeight: '300' as const,
-    fontFamily: Platform.select({
-      ios: 'Georgia',
-      android: 'serif',
-      web: 'Georgia, serif',
-    }),
+    fontSize: 36,
+    fontWeight: '400' as const,
+    fontFamily: SERIF,
+    fontStyle: 'italic' as const,
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 50,
-    letterSpacing: 0.3,
+    lineHeight: 56,
+    letterSpacing: 0.5,
   },
 
-  /* ── Share button ─────────────────────────────── */
-  shareBtnWrap: {
-    marginTop: 36,
-  },
+  shareBtnWrap: { marginTop: 40 },
   shareBtn: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     paddingHorizontal: 28,
     paddingVertical: 15,
     borderRadius: 100,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.16)',
   },
   shareBtnText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500' as const,
-    color: 'rgba(255,255,255,0.85)',
-    letterSpacing: 0.3,
+    fontFamily: SANS,
+    color: 'rgba(255,255,255,0.8)',
+    letterSpacing: 0.8,
   },
 
-  /* ── Watermark ────────────────────────────────── */
   watermark: {
     position: 'absolute',
     bottom: 0,
@@ -283,13 +258,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   watermarkText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '400' as const,
-    color: 'rgba(255,255,255,0.45)',
-    letterSpacing: 2.5,
+    fontFamily: SANS,
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: 3,
   },
 
-  pressed: {
-    opacity: 0.6,
-  },
+  pressed: { opacity: 0.6 },
 });

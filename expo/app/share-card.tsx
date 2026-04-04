@@ -77,7 +77,10 @@ const SHARE_BUTTONS = [
 
 export default function ShareCardScreen() {
   const insets = useSafeAreaInsets();
-  const { mantraText = '' } = useLocalSearchParams<{ mantraText: string }>();
+  const { mantraText = '', arrivedAt = '' } = useLocalSearchParams<{
+    mantraText: string;
+    arrivedAt: string;
+  }>();
   const captureRef = useRef<any>(null);
 
   const [selectedStyle, setSelectedStyle] = useState<CardStyle>(() =>
@@ -183,6 +186,7 @@ export default function ShareCardScreen() {
           <ShareCardView
             cardStyle={selectedStyle}
             mantraText={mantraText}
+            arrivedAt={arrivedAt}
             width={PREVIEW_W}
             height={PREVIEW_H}
           />
@@ -265,6 +269,7 @@ export default function ShareCardScreen() {
             <ShareCardView
               cardStyle={selectedStyle}
               mantraText={mantraText}
+              arrivedAt={arrivedAt}
               width={CAPTURE_W}
               height={CAPTURE_H}
             />

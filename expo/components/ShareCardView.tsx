@@ -7,30 +7,35 @@ import type { CardStyle } from '@/utils/cardStyles';
 interface Props {
   cardStyle: CardStyle;
   mantraText: string;
+  arrivedAt?: string;
   width: number;
   height: number;
 }
 
 /**
- * The share card layout rendered at both preview size and full-res capture
- * size (360 x 640 logical → 1080 x 1920 at 3× DPI).
+ * The share card — editorial luxury aesthetic (think Aman Resorts).
  *
- * Layers:
- *   1. Gradient mesh background
- *   2. Dark vignette overlays (top + bottom + centre tint)
- *   3. Centred mantra text with drop shadow
- *   4. Bottom watermark
+ * Layers: mesh → vignettes → timestamp → mantra → watermark
  */
-export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
-  const fontSize = Math.max(16, Math.min(width * 0.09, 48));
-  const watermarkSize = Math.max(9, width * 0.028);
-  const paddingH = width * 0.10;
+export function ShareCardView({
+  cardStyle,
+  mantraText,
+  arrivedAt,
+  width,
+  height,
+}: Props) {
+  const scale = width / 390; // normalise against iPhone 14 width
+  const mantraSize = Math.max(18, Math.min(width * 0.085, 44));
+  const timestampSize = Math.max(8, width * 0.024);
+  const watermarkSize = Math.max(8, width * 0.026);
+  const paddingH = width * 0.11;
   const watermarkBottom = height * 0.04;
+  const timestampTop = height * 0.12;
 
   const shadow = {
     textShadowColor: cardStyle.textShadowColor,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: Math.max(6, width * 0.025),
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: Math.max(8, width * 0.02),
   };
 
   return (
@@ -53,7 +58,6 @@ export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
         style={[StyleSheet.absoluteFill, { height: height * 0.4 }]}
         pointerEvents="none"
       />
-
       {/* 2b — Bottom vignette */}
       <LinearGradient
         colors={[
@@ -70,19 +74,31 @@ export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
         }}
         pointerEvents="none"
       />
-
-      {/* 2c — Subtle centre darkening */}
+      {/* 2c — Centre darkening */}
       <View
         style={[
           StyleSheet.absoluteFill,
-          {
-            backgroundColor: `rgba(0,0,0,${cardStyle.overlayStrength * 0.35})`,
-          },
+          { backgroundColor: `rgba(0,0,0,${cardStyle.overlayStrength * 0.35})` },
         ]}
         pointerEvents="none"
       />
 
-      {/* 3 — Centred mantra text (nudged slightly above true centre) */}
+      {/* 3 — Timestamp (top centre) */}
+      {arrivedAt ? (
+        <View style={[styles.timestampWrap, { top: timestampTop }]}>
+          <Text
+            style={[
+              styles.timestampText,
+              shadow,
+              { fontSize: timestampSize, color: cardStyle.watermarkColor },
+            ]}
+          >
+            {arrivedAt.toUpperCase()}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* 4 — Centred mantra text */}
       <View
         style={[
           StyleSheet.absoluteFill,
@@ -95,9 +111,9 @@ export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
             styles.mantraText,
             shadow,
             {
-              fontSize,
+              fontSize: mantraSize,
               color: cardStyle.textColor,
-              lineHeight: fontSize * 1.48,
+              lineHeight: mantraSize * 1.55,
             },
           ]}
         >
@@ -105,7 +121,7 @@ export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
         </Text>
       </View>
 
-      {/* 4 — Bottom watermark */}
+      {/* 5 — Bottom watermark */}
       <View
         style={[
           styles.watermarkWrap,
@@ -126,20 +142,40 @@ export function ShareCardView({ cardStyle, mantraText, width, height }: Props) {
   );
 }
 
+const SERIF = Platform.select({
+  ios: 'Didot',
+  android: 'serif',
+  web: 'Didot, "Playfair Display", "Cormorant Garamond", Georgia, serif',
+});
+
+const SANS = Platform.select({
+  ios: 'Avenir Next',
+  android: 'sans-serif',
+  web: '"Avenir Next", Avenir, Montserrat, sans-serif',
+});
+
 const styles = StyleSheet.create({
   centred: {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  timestampWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  timestampText: {
+    fontFamily: SANS,
+    fontWeight: '500' as const,
+    letterSpacing: 4,
+  },
   mantraText: {
-    fontFamily: Platform.select({
-      ios: 'Georgia',
-      android: 'serif',
-      web: 'Georgia, serif',
-    }),
-    fontWeight: '300' as const,
+    fontFamily: SERIF,
+    fontWeight: '400' as const,
+    fontStyle: 'italic' as const,
     textAlign: 'center',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
   watermarkWrap: {
     position: 'absolute',
@@ -148,13 +184,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   watermarkText: {
-    fontFamily: Platform.select({
-      ios: 'Helvetica Neue',
-      android: 'sans-serif',
-      web: 'sans-serif',
-    }),
+    fontFamily: SANS,
     fontWeight: '400' as const,
-    letterSpacing: 2,
+    letterSpacing: 3,
     textAlign: 'center',
   },
 });
