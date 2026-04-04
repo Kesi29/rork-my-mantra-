@@ -3,7 +3,7 @@
   "expo": {
     "name": "Mantra",
     "slug": "daily-mantra-notifications-2-e",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rork-app",

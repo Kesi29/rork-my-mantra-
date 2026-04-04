@@ -12,6 +12,10 @@ export interface CardStyle {
   blobs: BlobDef[];
   textColor: string;
   watermarkColor: string;
+  /** Opacity of the dark vignette overlay that ensures text legibility (0–1) */
+  overlayStrength: number;
+  /** Shadow color behind text — heavier on bright/light backgrounds */
+  textShadowColor: string;
 }
 
 export const CARD_STYLES: CardStyle[] = [
@@ -26,8 +30,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#e8447a', x: 0.70, y: 0.60, radius: 0.40 },
       { color: '#d4145a', x: 0.50, y: 1.00, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.92)',
-    watermarkColor: 'rgba(255,255,255,0.45)',
+    textColor: '#FFFFFF',
+    watermarkColor: 'rgba(255,255,255,0.55)',
+    overlayStrength: 0.35,
+    textShadowColor: 'rgba(80,0,30,0.6)',
   },
   {
     id: 'ocean',
@@ -40,8 +46,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#0a2463', x: 0.85, y: 0.90, radius: 0.40 },
       { color: '#1e6091', x: 0.50, y: 0.50, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.92)',
-    watermarkColor: 'rgba(255,255,255,0.4)',
+    textColor: '#FFFFFF',
+    watermarkColor: 'rgba(255,255,255,0.45)',
+    overlayStrength: 0.2,
+    textShadowColor: 'rgba(0,10,40,0.5)',
   },
   {
     id: 'forest',
@@ -54,8 +62,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#1a4a2e', x: 0.80, y: 0.85, radius: 0.40 },
       { color: '#52b788', x: 0.50, y: 0.50, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.92)',
-    watermarkColor: 'rgba(255,255,255,0.4)',
+    textColor: '#FFFFFF',
+    watermarkColor: 'rgba(255,255,255,0.45)',
+    overlayStrength: 0.22,
+    textShadowColor: 'rgba(0,20,10,0.5)',
   },
   {
     id: 'dusk',
@@ -68,8 +78,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#2d1b69', x: 0.20, y: 0.90, radius: 0.40 },
       { color: '#9b4dca', x: 0.50, y: 0.50, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.92)',
-    watermarkColor: 'rgba(255,255,255,0.4)',
+    textColor: '#FFFFFF',
+    watermarkColor: 'rgba(255,255,255,0.45)',
+    overlayStrength: 0.2,
+    textShadowColor: 'rgba(20,0,50,0.5)',
   },
   {
     id: 'sand',
@@ -82,8 +94,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#a0522d', x: 0.85, y: 0.85, radius: 0.40 },
       { color: '#d4a574', x: 0.50, y: 0.50, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.95)',
-    watermarkColor: 'rgba(255,255,255,0.45)',
+    textColor: '#FFFFFF',
+    watermarkColor: 'rgba(255,255,255,0.55)',
+    overlayStrength: 0.4,
+    textShadowColor: 'rgba(60,30,0,0.65)',
   },
   {
     id: 'midnight',
@@ -96,8 +110,10 @@ export const CARD_STYLES: CardStyle[] = [
       { color: '#0a0a0a', x: 0.85, y: 0.85, radius: 0.40 },
       { color: '#1a1a2e', x: 0.50, y: 0.50, radius: 0.40 },
     ],
-    textColor: 'rgba(255,255,255,0.88)',
+    textColor: 'rgba(255,255,255,0.92)',
     watermarkColor: 'rgba(255,255,255,0.3)',
+    overlayStrength: 0.0,
+    textShadowColor: 'rgba(0,0,0,0.4)',
   },
 ];
 
