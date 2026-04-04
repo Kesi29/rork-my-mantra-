@@ -24,13 +24,10 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IMAGE_SIZE = Math.min(110, SCREEN_WIDTH * 0.26);
 
 function getWeekDays(today: Date): Date[] {
-  const dayOfWeek = today.getDay();
-  const sunday = new Date(today);
-  sunday.setDate(today.getDate() - dayOfWeek);
   const days: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(sunday);
-    d.setDate(sunday.getDate() + i);
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
     days.push(d);
   }
   return days;
@@ -192,7 +189,7 @@ export default function HomeScreen() {
                         !isSelected && isDayToday && styles.dayTextToday,
                       ]}
                     >
-                      {DAY_LABELS[i]}
+                      {isDayToday ? 'TODAY' : DAY_LABELS[d.getDay()]}
                     </Text>
                     {isSelected && <View style={styles.dayUnderline} />}
                   </Pressable>
